@@ -1,0 +1,77 @@
+<%- include("partials/admin_layout") %>
+<main class="h-full pb-16 overflow-y-auto">
+  <div class="container px-6 mx-auto grid">
+    <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
+    Kullanıcı bilgileri
+    </h4>
+    <div class="grid gap-6 mb-8 md:grid-cols-2">
+      <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+        <img src="Home/images/bahadır.jpeg" width="500" height="600" alt="res" style="display: inline-block;">
+      </div>
+      <div class="min-w-0 p-4 text-white bg-purple-600 rounded-lg shadow-xs">
+        <h4 class="mb-4 font-semibold">
+          Genel Bilgiler
+        </h4>
+        <style>
+          ul {
+            list-style-type: none;
+            padding: 0;
+          }
+      
+          li {
+            margin-bottom: 10px;
+            display: flex; /* Flexbox'u etkinleştir */
+          }
+      
+          strong {
+            display: inline-block;
+            width: 100px;
+            font-weight: bold;
+          }
+      
+          span {
+            flex: 1; /* Geri kalan alanı kapla */
+          }
+        </style>
+        <ul><% Kullanicis.forEach(user => { %>
+          <!-- Her bir kullanıcı için bir liste öğesi ekleyin -->
+          <li>
+            <strong>Ad Soyad:</strong>
+            <span><%= user.AdSoyad %></span>
+          </li>
+          <li>
+            <strong>Email:</strong>
+            <span><%= user.Email %></span>
+          </li>
+          <li>
+            <strong>Telefon:</strong>
+            <span><%= user.Telefon %></span>
+          </li>
+          <li>
+            <strong>Ünvan:</strong>
+            <span><%= user.Unvan %></span>
+          </li>
+          <li>
+            <strong>Yaş :</strong>
+            <span><%= user.Yas %></span>
+          </li>
+          <li>
+            <strong>Adres :</strong>
+            <span><%= user.Adres %></span>
+          </li>
+          <li>
+            <strong>Hakkımda:</strong>
+          </li>
+          <p>
+            <%= user.Hakkimda %>
+          </p>
+          <% }) %>
+        </ul>
+
+      </div>
+    </div>
+</main>
+</div>
+   </div>
+  </body>
+</html>
