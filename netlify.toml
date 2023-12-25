@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build"  # Projenizin derleme komutu
+  publish = "public"
+
+[context.production]
+  [context.production.environment]
+    NODE_VERSION = "14.x"
