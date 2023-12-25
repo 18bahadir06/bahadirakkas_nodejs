@@ -1,6 +1,6 @@
 {
   "engines": {
-    "node": "20.x"
+    "node": "18.x"
   },
   "name": "bahadirakkas-1",
   "version": "1.0.0",
