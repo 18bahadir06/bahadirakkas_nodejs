@@ -1085,8 +1085,6 @@ app.post('/mesajdelete/:id', async (req, res) => {
   }
 });
 
-
-
-//app.listen(port, () => {
-  //console.log(`Uygulama ${port} portunda çalışıyor`);
-//});
+app.listen(port, () => {
+  console.log(`Uygulama ${port} portunda çalışıyor`);
+});
