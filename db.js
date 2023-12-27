@@ -3,10 +3,7 @@ import mongoose from "mongoose";
 const conn = () => {
     mongoose.connect(process.env.DB_URI, {
         dbName: "bahadirakkasdb",
-<<<<<<< HEAD
-        useNewUrlParser: true,
-=======
->>>>>>> e1786c52ab41c1f25187d31caee7513c53b1a779
+        //useNewUrlParser: true,
         useUnifiedTopology: true,
     })
     .then(() => {
