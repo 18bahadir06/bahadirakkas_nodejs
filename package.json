@@ -10,8 +10,8 @@
   "type": "module",
   "scripts": {
     "start": "nodemon app.js",
-    "predeploy":"npm run build",
-    "deploy":"gh-pages -d build"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "author": "bahadir",
   "license": "ISC",
