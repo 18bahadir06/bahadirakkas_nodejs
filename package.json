@@ -10,11 +10,10 @@
   "type": "module",
 
   "scripts": {
-    "start": "nodemon app.js",
-    "predeploy":"npm run build",
-    "deploy": "gh-pages -d build",
-    "build": "npm run build",
-    "generate": ""
+  "start": "nodemon app.js",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d build",
+  "build": "your-build-command-here"
     
   },
   "author": "bahadir",
