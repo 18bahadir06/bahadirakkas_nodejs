@@ -13,7 +13,8 @@
     "start": "nodemon app.js",
     "predeploy":"npm run build",
     "deploy": "gh-pages -d build",
-    "build": "npm run generate"
+    "build": "npm run generate",
+    "generate": "npm run build"
     
   },
   "author": "bahadir",
