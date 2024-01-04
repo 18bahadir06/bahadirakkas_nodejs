@@ -71,7 +71,7 @@
             <%= Portfolyo.Baslik1 %>
           </h2>
           <hr class="my-8" />
-          <% if(Portfolyo.GitLink !== "" && Portfolyo.GitLink !== null){%>
+          <% if(Portfolyo.GitLink !== "" || Portfolyo.GitLink !== null){%>
             <div class="px-6 my-6">
               <a style="background-color: #63b3ed; color:white;" class="flex items-center justify-between p-4 mb-8 text-sm font-semibold text-purple-100 bg-purple-600 rounded-lg shadow-md focus:outline-none focus:shadow-outline-purple" href="<%=Portfolyo.GitLink%>">
                   <div class="flex items-center">

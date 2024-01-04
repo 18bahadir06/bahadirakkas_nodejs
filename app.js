@@ -22,7 +22,15 @@ import Egitim from './models/Egitim.js';
 import BoolOnay from './models/BoolOnay.js';
 import Login from './models/login.js';
 import cookieSession from 'cookie-session';
+import cloudinary from 'cloudinary';
+import axios from 'axios';
+import FormData from 'form-data';
 
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
 
 
 dotenv.config();
@@ -44,7 +52,32 @@ app.use(cookieSession({
   keys: ['your-secret-key'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
+//const storage5 = multer.memoryStorage();
+//const upload5 = multer({ storage: storage5 });
+const upload5 = multer({ dest: 'uploads/' });
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Route tanımı
+app.post('/upload', upload5.single('Resim1'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Dosya bulunamadı.' });
+    }
+
+    const result = await cloudinary.v2.uploader.upload(req.file.path, {
+      folder: 'bahadirakkas',
+      api_key: process.env.CLOUD_API_KEY,
+      api_secret: process.env.CLOUD_API_SECRET,
+      cloud_name: process.env.CLOUD_NAME,
+    });
+
+    res.json({ url: result.secure_url });
+  } catch (error) {
+    console.error('Yükleme hatası:', error);
+    res.status(500).json({ error: 'Dosya yüklenirken bir hata oluştu.' });
+  }
+});
 
 app.get('/', async (req, res) => {
   try {
@@ -712,16 +745,24 @@ const upload3 = multer({ storage: storage3 });
 app.get('/portadd', (req,res)=>{ 
   res.render('Admin/portadd');
 })
-app.post('/portadd', upload3.single('Resim1'), (req, res) => {
+app.post('/portadd', upload5.single('Resim1'), async (req, res) => {
   try {
     // Dosya yüklendiyse işlem yap
     if (req.file) {
-      const resimDosyaAdi = "Portfolyo/"+req.file.filename;
-
+      //const resimDosyaAdi = "Portfolyo/"+req.file.filename;
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      
+        const result = await cloudinary.v2.uploader.upload(req.file.path, {
+          folder: 'bahadirakkas',
+          api_key: process.env.CLOUD_API_KEY,
+          api_secret: process.env.CLOUD_API_SECRET,
+          cloud_name: process.env.CLOUD_NAME,
+          public_id: uniqueSuffix,
+        });     
       if (req.body.Blog == "false") {
         const yeniport = new Portfolyo({
           Baslik1: req.body.Baslik1,
-          Resim1: resimDosyaAdi,
+          Resim1: result.secure_url,
           Link: req.body.Link,
           Tur: req.body.Tur,
           Blog: false,
