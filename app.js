@@ -762,7 +762,7 @@ app.post('/portadd', upload5.single('Resim1'), async (req, res) => {
 
         const yeniport2 = new Portfolyo({
           Baslik1: req.body.Baslik1,
-          Resim1: resimDosyaAdi,
+          Resim1: result.secure_url,
           Baslik2: baslik2,
           Text: text,
           Link: "",
