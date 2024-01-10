@@ -420,16 +420,28 @@ app.post('/uploadimage', upload5.single('filename'), async(req, res) => {
         
       });
       const result = await cloudinary.v2.uploader.upload(req.file.path, {
-        folder: 'bahadirakkas/Home',
+        folder: 'bahadirakkas/HOME',
         api_key: process.env.CLOUD_API_KEY,
         api_secret: process.env.CLOUD_API_SECRET,
         cloud_name: process.env.CLOUD_NAME,
         public_id: dosyaAdi,
       })
+      var item = {
+        Foto:result.secure_url,
+      };
+
+      const result2 = await Kullanici.updateOne(
+        { _id: user._id },
+        { $set: item }
+      );
+      if (result.modifiedCount === 1) {
+        console.log('Veri tabanına kayıt yapıldı.');
+      } else {
+        console.log('Veri tabanında kullanıcı bulunamadı.');
+      } 
     }catch(error){
       console.log('yükleme hata gerçekleşti',error);
    }
-    
   console.log('Dosya yüklendi:');
   res.redirect('/user');
 });
@@ -835,7 +847,7 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/portup',upload5.single('Resim1'), async(req,res)=>{
   const id = req.body._id;
   const portfolyo=await models.Portfolyo.findById(id);
-  const url = portfolyo.Resim1;
+  let url = portfolyo.Resim1;
   const dosyaAdi = url.split('/').pop().split('.')[0];
   if(req.file){
     const delet = await cloudinary.v2.uploader.destroy(`bahadirakkas/portfolyo/`+dosyaAdi, {
@@ -851,7 +863,7 @@ app.post('/portup',upload5.single('Resim1'), async(req,res)=>{
       cloud_name: process.env.CLOUD_NAME,
       public_id: dosyaAdi,
     });
-    
+    url=result.secure_url;
   }
 
   if(portfolyo.Blog){
@@ -880,16 +892,18 @@ app.post('/portup',upload5.single('Resim1'), async(req,res)=>{
     );
     if (result.modifiedCount === 1) {
       console.log('Değer başarıyla güncellendi.');
+      res.redirect('/port');
     } else {
       console.log(req.body.LinkId);
-      console.log('Belirtilen ID ile eşleşen belge bulunamadı.' );
+      console.log('Belirtilen ID ile eşleşen belge bulunamadı.',docId);
     }
+    //res.redirect('/port');
   } catch (error) {
     console.error('Hata:', error);
-    res.redirect('/port');
+   // res.redirect('/port');
   }
 
-  res.redirect('/port');
+  //res.redirect('/port');
 });
 //////////////////////// sen bi
 
