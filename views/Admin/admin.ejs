@@ -6,7 +6,9 @@
     </h4>
     <div class="grid gap-6 mb-8 md:grid-cols-2">
       <div class="min-w-0 p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
-        <img src="Home/images/bahadır.jpeg" width="500" height="600" alt="res" style="display: inline-block;">
+        <% Kullanicis.forEach(user => { %>
+        <img src="<%=user.Foto%>" width="500" height="600" alt="res" style="display: inline-block;">
+        <%})%>
       </div>
       <div class="min-w-0 p-4 text-white bg-purple-600 rounded-lg shadow-xs">
         <h4 class="mb-4 font-semibold">

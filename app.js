@@ -53,32 +53,14 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 //const storage5 = multer.memoryStorage();
-//const upload5 = multer({ storage: storage5 });
+
 const upload5 = multer({ dest: 'uploads/' });
+const upload6 = multer({ dest: 'uploads/' });
+const upload7 = multer({ dest: 'uploads/' });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Route tanımı
-app.post('/upload', upload5.single('Resim1'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'Dosya bulunamadı.' });
-    }
-
-    const result = await cloudinary.v2.uploader.upload(req.file.path, {
-      folder: 'bahadirakkas',
-      api_key: process.env.CLOUD_API_KEY,
-      api_secret: process.env.CLOUD_API_SECRET,
-      cloud_name: process.env.CLOUD_NAME,
-    });
-
-    res.json({ url: result.secure_url });
-  } catch (error) {
-    console.error('Yükleme hatası:', error);
-    res.status(500).json({ error: 'Dosya yüklenirken bir hata oluştu.' });
-  }
-});
-
 app.get('/', async (req, res) => {
   try {
     // Tüm modellerden verileri tek bir sorguda çekme
@@ -104,7 +86,7 @@ app.get('/', async (req, res) => {
     });
   } catch (err) {
     console.error("Veri çekme hatası:", err);
-    res.render('Admin/yetenek', { Yetenekler: [] });
+    res.render('Admin/404');
   }
 });
 // Home port sayfası
@@ -424,39 +406,32 @@ app.post('/upload', upload.single('filename'), (req, res) => {
 });
 
 //upload image profil foto
-const storage2 = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/Home/images/'); // Dosyanın kaydedileceği klasör
-  },
-  filename: function (req, file, cb) {
-    // Dosya adının ne olacağı
-    const dosyaAdi = 'bahadır';
-    const uzanti = ".jpeg";
-    const tamDosyaAdi = dosyaAdi + uzanti;
 
-    // Eski image dosyasını sil
-    const eskiad = "bahadır.jpeg";
-    fs.unlink('public/Home/images/' + eskiad, (err) => {
-      if (err && err.code !== 'ENOENT') {
-        console.error('Eski resmi silerken hata oluştu:', err);
-        // Hata durumunda da devam etmek istiyorsanız, bu hatayı cb'ye iletin.
-        // cb(err);
-      }
-
-      // Yeni resim dosyasını kaydet
-      cb(null, tamDosyaAdi);
-    });
-  }
-});
-
-const upload2 = multer({ storage: storage2 });
-
-app.post('/uploadimage', upload2.single('filename'), (req, res) => {
-  // Dosya yüklendikten sonra burası çalışacak
-  console.log('Dosya yüklendi:', req.file);
-  setTimeout(() => {
-    res.redirect('/user');
-  }, 5000);
+app.post('/uploadimage', upload5.single('filename'), async(req, res) => {
+  const user = await models.Kullanici.findOne().sort({ createdAt: -1 });
+  const url = user.Foto;
+  const dosyaAdi = url.split('/').pop().split('.')[0];
+  console.log("publicId:", dosyaAdi);
+    try {
+      await cloudinary.v2.uploader.destroy('bahadirakkas/Home/'+dosyaAdi, {
+        api_key: process.env.CLOUD_API_KEY,
+        api_secret: process.env.CLOUD_API_SECRET,
+        cloud_name: process.env.CLOUD_NAME,
+        
+      });
+      const result = await cloudinary.v2.uploader.upload(req.file.path, {
+        folder: 'bahadirakkas/Home',
+        api_key: process.env.CLOUD_API_KEY,
+        api_secret: process.env.CLOUD_API_SECRET,
+        cloud_name: process.env.CLOUD_NAME,
+        public_id: dosyaAdi,
+      })
+    }catch(error){
+      console.log('yükleme hata gerçekleşti',error);
+   }
+    
+  console.log('Dosya yüklendi:');
+  res.redirect('/user');
 });
 
 //Eğitim sayfası listeleme
@@ -732,16 +707,9 @@ app.get('/port', (req,res)=>{
   });
 })
 //Portfolyo resim 1
-const storage3 = multer.diskStorage({
-  destination: 'public/Portfolyo',
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + '.jpg');
-  }
-});
-const upload3 = multer({ storage: storage3 });
 
-//portfolyo add sayfası
+
+//portfolyo add sayfası + 
 app.get('/portadd', (req,res)=>{ 
   res.render('Admin/portadd');
 })
@@ -750,10 +718,9 @@ app.post('/portadd', upload5.single('Resim1'), async (req, res) => {
     // Dosya yüklendiyse işlem yap
     if (req.file) {
       //const resimDosyaAdi = "Portfolyo/"+req.file.filename;
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9); 
         const result = await cloudinary.v2.uploader.upload(req.file.path, {
-          folder: 'bahadirakkas',
+          folder: 'bahadirakkas/portfolyo',
           api_key: process.env.CLOUD_API_KEY,
           api_secret: process.env.CLOUD_API_SECRET,
           cloud_name: process.env.CLOUD_NAME,
@@ -816,25 +783,29 @@ app.post('/portadd', upload5.single('Resim1'), async (req, res) => {
     res.status(500).send('Ekleme hatası: ' + err.message);
   }
 });
+//Portfolyo silme işlemi
 app.use(express.urlencoded({ extended: true }));
 app.post('/portdelete/:id', async (req, res) => {
   const PortId = req.params.id;
   const Port = await models.Portfolyo.findById(PortId);
   const imageLink = Port.Resim1;
+  const url = Port.Resim1;
+  const dosyaAdi = url.split('/').pop().split('.')[0];
   
-  
+  console.log("publicId:", dosyaAdi);
+
   try {
     const result = await models.Portfolyo.deleteMany({ _id: PortId });
     if(imageLink){
-      fs.unlink('public/'+imageLink, err=>{
-        if(err){
-          console.log(err);
-        }
+      await cloudinary.v2.uploader.destroy('bahadirakkas/portfolyo/'+dosyaAdi, {
+        api_key: process.env.CLOUD_API_KEY,
+        api_secret: process.env.CLOUD_API_SECRET,
+        cloud_name: process.env.CLOUD_NAME,
       });
     }
 
     if (result.deletedCount > 0) {
-      console.log('Portfolyo başarıyla silindi:', result,imageLink);
+      console.log('Portfolyo başarıyla silindi:', result,imageLink, dosyaAdi);
       return res.redirect('/port'); // return anahtar kelimesi ile işlemi sonlandırın
     } else {
       console.log('Belirtilen ID ile eşleşen Portfolyo bulunamadı.');
@@ -861,27 +832,26 @@ app.get('/portup/:id', async (req, res) => {
 });
 //Portfolyo güncelleme işlemi
 app.use(express.urlencoded({ extended: true }));
-app.post('/portup',upload3.single('Resim1'), async(req,res)=>{
+app.post('/portup',upload5.single('Resim1'), async(req,res)=>{
   const id = req.body._id;
   const portfolyo=await models.Portfolyo.findById(id);
-  let newImage =null;
-  const link=portfolyo.Resim1;
+  const url = portfolyo.Resim1;
+  const dosyaAdi = url.split('/').pop().split('.')[0];
   if(req.file){
-    newImage =req.file.filename;
-    if(link){
-      try{
-        fs.unlink('public/'+link, err=>{
-          if(err){
-            console.log(err);
-          }
-        });
-      }catch(err){
-        console.error('eski resim silinirken hata oldu', error);
-      }
-    }
-    newImage='/Portfolyo/'+newImage;
-  }else{
-    newImage=link;
+    const delet = await cloudinary.v2.uploader.destroy(`bahadirakkas/portfolyo/`+dosyaAdi, {
+      api_key: process.env.CLOUD_API_KEY,
+      api_secret: process.env.CLOUD_API_SECRET,
+      cloud_name: process.env.CLOUD_NAME,
+    });
+    
+    const result = await cloudinary.v2.uploader.upload(req.file.path, {
+      folder: 'bahadirakkas/portfolyo',
+      api_key: process.env.CLOUD_API_KEY,
+      api_secret: process.env.CLOUD_API_SECRET,
+      cloud_name: process.env.CLOUD_NAME,
+      public_id: dosyaAdi,
+    });
+    
   }
 
   if(portfolyo.Blog){
@@ -891,7 +861,7 @@ app.post('/portup',upload3.single('Resim1'), async(req,res)=>{
       Tur:req.body.Tur,
       Text:req.body.Text,
       GitLink:req.body.GitLink,
-      Resim1:newImage,
+      Resim1:url,
     };
   }else{
     var item = {
@@ -899,7 +869,7 @@ app.post('/portup',upload3.single('Resim1'), async(req,res)=>{
       Tur:req.body.Tur,
       Link:req.body.Link,
       GitLink:req.body.GitLink,
-      Resim1:newImage, 
+      Resim1:url, 
     };
   }
   try {
@@ -921,7 +891,7 @@ app.post('/portup',upload3.single('Resim1'), async(req,res)=>{
 
   res.redirect('/port');
 });
-
+//////////////////////// sen bi
 
 
 

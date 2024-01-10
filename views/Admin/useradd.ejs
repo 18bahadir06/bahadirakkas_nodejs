@@ -534,8 +534,11 @@
           <!-- General elements -->
           
           <div  class="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">   
+            <% Kullanicis.forEach(user => { %>
             <form action="/uploadimage" method="post" enctype="multipart/form-data">
-              <img src="Home/images/bahadır.jpeg" width="500" height="600" alt="res" style="display: inline-block;">
+              
+              <img src="<%=user.Foto%>" width="500" height="600" alt="res" style="display: inline-block;">
+              
             </br>
               <label class="block text-sm" style="display: inline-block;"> <span class="text-gray-700 dark:text-gray-400">Profil fotosunu değiştir</span> </label>
               <input type="file" name="filename">  </br>
@@ -543,7 +546,7 @@
                 Yeni profil yükle
               </button>
             </form>
-          
+            <%})%>
               <% Kullanicis.forEach(user => { %>
               <form action="/useradd" method="post">            
           
